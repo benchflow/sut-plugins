@@ -10,7 +10,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import cloud.benchflow.libraries.WfMSApi;
+import cloud.benchflow.libraries.wfms.WfMSApi;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
