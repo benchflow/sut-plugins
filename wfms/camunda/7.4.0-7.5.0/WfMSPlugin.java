@@ -35,6 +35,7 @@ private class WfMSPlugin extends WfMSApi {
     public WfMSPlugin(String sutEndpoint) {
         super(sutEndpoint, "/deployment/create");
         processDefinitionAPI = sutEndpoint + "/process-definition";
+        logger.info("[WfMSPlugin] Set processDefinition API to: " + processDefinitionAPI);
         parser = new JsonParser();
         //this.modelsStartID = new HashMap<String, String>();
         JSONHeaders = new TreeMap<String, String>();
@@ -58,12 +59,16 @@ private class WfMSPlugin extends WfMSApi {
         String deploymentId = deployObj.get("id").getAsString();
 
         //Obtain process definition data
+        logger.info("[WfMSPlugin] About to deploy at: " + processDefinitionAPI + "?deploymentId=" + deploymentId);
         StringBuilder procDef = http.fetchURL(processDefinitionAPI + "?deploymentId=" + deploymentId);
         String processDefinitionResponse = procDef.toString();
+        logger.info("[WfMSPlugin] Deploy response: " + processDefinitionResponse);
 
         JsonArray procDefArray = parser.parse(processDefinitionResponse).getAsJsonArray();
         //We only get 1 element using the deploymentId
         String processDefinitionId = procDefArray.get(0).getAsJsonObject().get("id").getAsString();
+        logger.info("[WfMSPlugin] Process definition id: " + processDefinitionAPI);
+
         result.put(model.getName(), processDefinitionId);
         return result;
 
