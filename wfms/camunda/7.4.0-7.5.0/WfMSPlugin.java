@@ -76,7 +76,9 @@ private class WfMSPlugin extends WfMSApi {
 
     public String startProcessInstance(String processDefinitionId, String data) throws IOException {
         String startURL = sutEndpoint + "/process-definition/" + modelsStartID.get(processDefinitionId) + "/start";
+        logger.info("[WfMSPlugin] Start process instance url: " + startURL);
         StringBuilder responseStart = http.fetchURL(startURL, "{}", JSONHeaders);
+        logger.info("[WfMSPlugin] Start process instance response: " + responseStart.toString());
         return responseStart.toString();
     }
 }
