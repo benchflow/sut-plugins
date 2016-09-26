@@ -1,16 +1,17 @@
-package cloud.benchflow.plugins.camunda;
+package cloud.benchflow.plugins.wfms.camunda;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import cloud.benchflow.libraries.WfMSApi;
+import cloud.benchflow.libraries.wfms.WfMSApi;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
@@ -35,6 +36,7 @@ private class WfMSPlugin extends WfMSApi {
     public WfMSPlugin(String sutEndpoint) {
         super(sutEndpoint, "/deployment/create");
         processDefinitionAPI = sutEndpoint + "/process-definition";
+        logger.info("[WfMSPlugin] Set processDefinition API to: " + processDefinitionAPI);
         parser = new JsonParser();
         //this.modelsStartID = new HashMap<String, String>();
         JSONHeaders = new TreeMap<String, String>();
@@ -58,12 +60,16 @@ private class WfMSPlugin extends WfMSApi {
         String deploymentId = deployObj.get("id").getAsString();
 
         //Obtain process definition data
+        logger.info("[WfMSPlugin] About to deploy at: " + processDefinitionAPI + "?deploymentId=" + deploymentId);
         StringBuilder procDef = http.fetchURL(processDefinitionAPI + "?deploymentId=" + deploymentId);
         String processDefinitionResponse = procDef.toString();
+        logger.info("[WfMSPlugin] Deploy response: " + processDefinitionResponse);
 
         JsonArray procDefArray = parser.parse(processDefinitionResponse).getAsJsonArray();
         //We only get 1 element using the deploymentId
         String processDefinitionId = procDefArray.get(0).getAsJsonObject().get("id").getAsString();
+        logger.info("[WfMSPlugin] Process definition id: " + processDefinitionAPI);
+
         result.put(model.getName(), processDefinitionId);
         return result;
 
@@ -71,7 +77,9 @@ private class WfMSPlugin extends WfMSApi {
 
     public String startProcessInstance(String processDefinitionId, String data) throws IOException {
         String startURL = sutEndpoint + "/process-definition/" + modelsStartID.get(processDefinitionId) + "/start";
+        logger.info("[WfMSPlugin] Start process instance url: " + startURL);
         StringBuilder responseStart = http.fetchURL(startURL, "{}", JSONHeaders);
+        logger.info("[WfMSPlugin] Start process instance response: " + responseStart.toString());
         return responseStart.toString();
     }
 }
