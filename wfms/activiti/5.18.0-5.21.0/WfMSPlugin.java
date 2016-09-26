@@ -1,4 +1,4 @@
-package cloud.benchflow.plugins.activiti;
+package cloud.benchflow.plugins.wfms.activiti;
 
 import java.util.HashMap;
 import java.util.Map;
