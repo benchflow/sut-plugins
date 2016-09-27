@@ -38,6 +38,7 @@ private class WfMSPlugin extends WfMSApi {
     public WfMSPlugin(String sutEndpoint) {
     	super(sutEndpoint,"/service/repository/deployments");
         processDefinitionAPI = sutEndpoint + "/service/repository/process-definitions";
+        logger.info("[WfMSPlugin] Set processDefinition API to: " + processDefinitionAPI);
         parser = new JsonParser();
         //this.modelsStartID = new HashMap<String, String>();
         JSONHeaders = new TreeMap<String, String>();
@@ -69,12 +70,15 @@ private class WfMSPlugin extends WfMSApi {
         String deploymentId = deployObj.get("id").getAsString();
 
         //Obtain process definition data
+        logger.info("[WfMSPlugin] About to deploy at: " + processDefinitionAPI + "?deploymentId=" + deploymentId);
         StringBuilder procDef = http.fetchURL(processDefinitionAPI + "?deploymentId=" + deploymentId, AuthorizationHeaders);
         String processDefinitionResponse = procDef.toString();
+        logger.info("[WfMSPlugin] Deploy response: " + processDefinitionResponse);
 
         JsonObject procDefArray = parser.parse(processDefinitionResponse).getAsJsonObject();
         //We only get 1 element using the deploymentId
         String processDefinitionId = procDefArray.get("data").getAsJsonArray().get(0).getAsJsonObject().get("id").getAsString();
+        logger.info("[WfMSPlugin] Process definition id: " + processDefinitionAPI);
         result.put(model.getName(), processDefinitionId);
         return result;
 
@@ -82,6 +86,8 @@ private class WfMSPlugin extends WfMSApi {
 
     public String startProcessInstance(String processDefinitionId, String data) throws IOException {
     	String startURL = sutEndpoint + "/service/runtime/process-instances";
+    	
+    	logger.info("[WfMSPlugin] Start process instance url: " + startURL);
         
         JsonObject body = new JsonObject();
         body.addProperty("processDefinitionId", modelsStartID.get(processDefinitionId));
@@ -91,6 +97,7 @@ private class WfMSPlugin extends WfMSApi {
         Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
         
         StringBuilder responseStart = http.fetchURL(startURL, gson.toJson(body), AllHeaders);
+        logger.info("[WfMSPlugin] Start process instance response: " + responseStart.toString());
         return responseStart.toString();
     }
 }
